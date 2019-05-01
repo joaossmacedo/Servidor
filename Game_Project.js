@@ -3,7 +3,7 @@ const player1 = 'Joao';
 const player1Color = 'red';
 
 // var player2 = prompt("Player Two: Enter Your Name, you will be Blue");
-const player2 = 'Isabela';
+const player2 = 'Chico';
 const player2Color = 'mediumAquaMarine';
 
 var game_on = true;
