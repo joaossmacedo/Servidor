@@ -60,7 +60,13 @@ while True:
                 elif ext == 'js':
                     content_type = 'application'
                 elif ext == 'css':
-                    content_type = 'css'
+                    content_type = 'text'
+                elif ext == 'mpeg':
+                    content_type = 'audio'
+                elif ext == 'mp4':
+                    content_type = 'video'
+                elif ext == 'form-data':
+                    content_type = 'multipart'
                 else:
                     # como application eh o tipo mais comum se nao for
                     # um tipo nao esperado trata como application
