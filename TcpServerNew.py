@@ -1,37 +1,64 @@
 import socket
 
-h = open('Game_Project.html', 'r')
-homepage = h.read()
+# abre o arquivo
+arquivo = open('Game_Project.html', 'r')
+# le o arquivo
+pagina = arquivo.read()
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-print(s)
+# cria um objeto socket
+# o soquete faz
+soquete = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# imprime o socket algo do tipo <socket._socketobject object at 0x10070b600>
+print(soquete)
 
-PORT = 8000
-s.bind(('', PORT))
-s.listen(5)
-#conn, addr = s.accept()
+# liga o socket a um endereco
+PORTA = 8000
+soquete.bind(('', PORTA))
+# fica de olho para ver se e feita alguma conexao com o socket
+soquete.listen(5)
 
 while True:
-    print("")
-    conn, addr = s.accept()
-    data = conn.recv(2000)
+    # aceita a conexao(3-way handshake)
+    # conexao eh o novo socket usado para receber e mandar dados na conexao
+    # endereco eh o endereco ligado ao socket na outra ponta da conexao
+    conexao, endereco = soquete.accept()
+    # recebe a conexao com o socket
+    # size eh o limite de dados a serem recebidos de uma vez
+    size = 2000
+    data = conexao.recv(size)
 
     if 'GET' in data:
-        print('\n', data)
+        # print('\n', data)
+        # divide os dados de acordo com os espacos
         dataParse = data.split(' ')
-        if dataParse[1] == '/':
-            conn.sendall('HTTP/1.0 200 OK\r\n' +
-                         'Content-Type: text/html\r\n' +
-                         'Content-Length: ' + str(len(homepage)) + '\r\n\r\n' +
-                          homepage)
-        else:
-            ext = dataParse[1].rpartition(".")[-1]
-            f = open(dataParse[1][1:], 'r')
-            figure = f.read()
-            conn.sendall('HTTP/1.0 200 OK\r\n' +
-                         'Content-Type: image' + ext + '\r\n' +
-                         'Content-Length: ' + str(len(figure)) + '\r\n\r\n' +
-                          figure)
 
-    conn.close()
-s.close()
+        dataPrint = data.split('\r\n')
+        for i in range(len(dataPrint)):
+            print(dataPrint[i])
+
+        if dataParse[1] == '/':
+            # 220 quer dizer que a conexao deu certo
+            # len(pagina) eh o tamanho do arquivo
+            # pagina eh a propria pagina
+            conexao.sendall('HTTP/1.0 200 OK\r\n' +
+                         'Content-Type: text/html\r\n' +
+                         'Content-Length: ' + str(len(pagina)) + '\r\n\r\n' +
+                          pagina)
+        else:
+            # ext eh a extensao do arquivo(por exemplo: .gif, .)
+            ext = dataParse[1].rpartition(".")[-1]
+            # abre o arquivo(imagem)
+            f = open(dataParse[1][1:], 'r')
+            # le o arquivo(imagem)
+            figura = f.read()
+            # 220 quer dizer que a conexao deu certo
+            # len(figura) eh o tamanho do arquivo
+            # figura eh a propria figura
+            conexao.sendall('HTTP/1.0 200 OK\r\n' +
+                         'Content-Type: image' + ext + '\r\n' +
+                         'Content-Length: ' + str(len(figura)) + '\r\n\r\n' +
+                          figura)
+
+    print("\n")
+    conexao.close()
+soquete.close()
