@@ -46,7 +46,7 @@ while True:
                             'Content-Length: ' + str(len(pagina)) + '\r\n\r\n' +
                             pagina)
         else:
-            # para caso o usuario passe algo do tipo localhost:8000/test
+            # para caso o usuario algum dado sem extensao, como passar localhost:8000/test
             if '.' not in dataParse[1]:
                 print("ERROR: Data not available")
             else:
@@ -71,18 +71,22 @@ while True:
                     # como application eh o tipo mais comum se nao for
                     # um tipo nao esperado trata como application
                     content_type = 'application'
-    
-                # abre o arquivo
-                f = open(dataParse[1][1:], 'r')
-                # le o arquivo
-                arq = f.read()
-                # 200 quer dizer que a conexao deu certo
-                # len(arq) eh o tamanho do arquivo
-                conexao.sendall('HTTP/1.0 200 OK\r\n' +
-                                'Content-Type: ' + content_type + ext + '\r\n' +
-                                'Content-Length: ' + str(len(arq)) + '\r\n\r\n' +
-                                arq)
 
+                # o try eh necessario para o caso do arquivo ser inexistente
+                try:
+                    # abre o arquivo
+                    f = open(dataParse[1][1:], 'r')
+                    # le o arquivo
+                    arq = f.read()
+                    # 200 quer dizer que a conexao deu certo
+                    # len(arq) eh o tamanho do arquivo
+                    conexao.sendall('HTTP/1.0 200 OK\r\n' +
+                                    'Content-Type: ' + content_type + ext + '\r\n' +
+                                    'Content-Length: ' + str(len(arq)) + '\r\n\r\n' +
+                                    arq)
+                except Exception as error:
+                    print("ERROR: Unable to open file")
+                    print(error)
     print("")
     conexao.close()
 
