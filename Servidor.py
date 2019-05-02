@@ -12,9 +12,10 @@ soquete = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 print(soquete)
 
 # liga o socket a um endereco
+HOST = '127.0.0.1'
 PORTA = 8000
 soquete.bind(('', PORTA))
-# fica de olho para ver se e feita alguma conexao com o socket
+# fica de olho para ver se eh feita alguma conexao com o socket
 soquete.listen(5)
 
 while True:
@@ -22,6 +23,7 @@ while True:
     # conexao eh o novo socket usado para receber e mandar dados na conexao
     # endereco eh o endereco ligado ao socket na outra ponta da conexao
     conexao, endereco = soquete.accept()
+    print("\nConnected by: " + str(endereco[0]) + ":" + str(endereco[1]))
     # recebe a conexao com o socket
     # size eh o limite de dados a serem recebidos de uma vez
     size = 2000
@@ -41,9 +43,9 @@ while True:
             # len(pagina) eh o tamanho do arquivo
             # pagina eh a propria pagina
             conexao.sendall('HTTP/1.0 200 OK\r\n' +
-                         'Content-Type: text/html\r\n' +
-                         'Content-Length: ' + str(len(pagina)) + '\r\n\r\n' +
-                          pagina)
+                            'Content-Type: text/html\r\n' +
+                            'Content-Length: ' + str(len(pagina)) + '\r\n\r\n' +
+                            pagina)
         else:
             # ext eh a extensao do arquivo(por exemplo: .gif, .)
             ext = dataParse[1].rpartition(".")[-1]
@@ -55,10 +57,10 @@ while True:
             # len(figura) eh o tamanho do arquivo
             # figura eh a propria figura
             conexao.sendall('HTTP/1.0 200 OK\r\n' +
-                         'Content-Type: image' + ext + '\r\n' +
-                         'Content-Length: ' + str(len(figura)) + '\r\n\r\n' +
-                          figura)
+                            'Content-Type: image' + ext + '\r\n' +
+                            'Content-Length: ' + str(len(figura)) + '\r\n\r\n' +
+                            figura)
 
-    print("\n")
+    print("")
     conexao.close()
 soquete.close()
