@@ -6,23 +6,22 @@ arquivo = open('Game_Project.html', 'r')
 pagina = arquivo.read()
 
 # cria um objeto socket
-# o soquete faz
-soquete = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# imprime o socket algo do tipo <socket._socketobject object at 0x10070b600>
-print(soquete)
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# imprime o socket, algo do tipo <socket._socketobject object at 0x10070b600>
+print(s)
 
 # liga o socket a um endereco
 HOST = '127.0.0.1'
 PORTA = 8000
-soquete.bind(('', PORTA))
+s.bind((HOST, PORTA))
 # fica de olho para ver se eh feita alguma conexao com o socket
-soquete.listen(5)
+s.listen(5)
 
 while True:
     # aceita a conexao(3-way handshake)
     # conexao eh o novo socket usado para receber e mandar dados na conexao
     # endereco eh o endereco ligado ao socket na outra ponta da conexao
-    conexao, endereco = soquete.accept()
+    conexao, endereco = s.accept()
     print("\nConnected by: " + str(endereco[0]) + ":" + str(endereco[1]))
     # recebe a conexao com o socket
     # size eh o limite de dados a serem recebidos de uma vez
@@ -39,7 +38,7 @@ while True:
             print(dataPrint[i])
 
         if dataParse[1] == '/':
-            # 220 quer dizer que a conexao deu certo
+            # 200 quer dizer que a conexao deu certo
             # len(pagina) eh o tamanho do arquivo
             # pagina eh a propria pagina
             conexao.sendall('HTTP/1.0 200 OK\r\n' +
@@ -47,20 +46,39 @@ while True:
                             'Content-Length: ' + str(len(pagina)) + '\r\n\r\n' +
                             pagina)
         else:
-            # ext eh a extensao do arquivo(por exemplo: .gif, .)
-            ext = dataParse[1].rpartition(".")[-1]
-            # abre o arquivo(imagem)
-            f = open(dataParse[1][1:], 'r')
-            # le o arquivo(imagem)
-            figura = f.read()
-            # 220 quer dizer que a conexao deu certo
-            # len(figura) eh o tamanho do arquivo
-            # figura eh a propria figura
-            conexao.sendall('HTTP/1.0 200 OK\r\n' +
-                            'Content-Type: image' + ext + '\r\n' +
-                            'Content-Length: ' + str(len(figura)) + '\r\n\r\n' +
-                            figura)
+            # para caso o usuario passe algo do tipo localhost:8000/test
+            if '.' not in dataParse[1]:
+                print("ERROR: Data not available")
+            else:
+                # ext eh a extensao do arquivo(por exemplo: .gif ou .js)
+                ext = dataParse[1].rpartition(".")[-1]
+
+                # adequa o content_type ao tipo de extensao utilizado
+                if ext == 'png' or ext == 'jpg' or ext == 'jpeg' or \
+                        ext == 'gif' or ext == 'tiff':
+                    content_type = "image"
+                elif ext == 'js':
+                    content_type = 'application'
+                elif ext == 'css':
+                    content_type = 'css'
+                else:
+                    # como application eh o tipo mais comum se nao for
+                    # um tipo nao esperado trata como application
+                    content_type = 'application'
+    
+                # abre o arquivo
+                f = open(dataParse[1][1:], 'r')
+                # le o arquivo
+                arq = f.read()
+                # 200 quer dizer que a conexao deu certo
+                # len(arq) eh o tamanho do arquivo
+                conexao.sendall('HTTP/1.0 200 OK\r\n' +
+                                'Content-Type: ' + content_type + ext + '\r\n' +
+                                'Content-Length: ' + str(len(arq)) + '\r\n\r\n' +
+                                arq)
 
     print("")
     conexao.close()
-soquete.close()
+
+# eh desnecessario fechar o soquete visto que o codigo seria inalcancavel
+# devido ao While: True
