@@ -11,7 +11,7 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 print(s)
 
 # liga o socket a um endereco
-HOST = '127.0.0.1'
+HOST = ''
 PORTA = 8000
 s.bind((HOST, PORTA))
 # fica de olho para ver se eh feita alguma conexao com o socket
